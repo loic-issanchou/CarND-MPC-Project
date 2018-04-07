@@ -6,20 +6,24 @@ Self-Driving Car Engineer Nanodegree Program
 ## Rubric Points
 
 * The model
+
 The kinematic model used is the same used in the lesson. It take into account the vehicle's x and y coordinates, the orientation angle (psi), the velocity (v), the cross-track error (cte) and psi error (epsi). These variables are included in the state.
 The actuators are the acceleration (throttle_value) and the steering (steer_value).
 The update equations are given in the lesson. They uses the actuations and state from the previous timestep to calculate the current state.
 
 * Timestep Length and Elapsed Duration (N & dt)
+
 First, I used the same configuration that in the lesson, ie N=25 and dt=.05. 
 But with the timestep length at 25, I had some errors prediction that put the car off the lane. So I reduced the timestep length at 15. It was good for the global prediction, ie a corner was correctly detected. But, I had much oscillations. It was due to my third degree polynomial combines with a short duration. Indeed, when the different points prediction are not align or not "circular", and when these points are close together, the third degree polynomial must much oscille in order to target these points. So the steering value vary a lot. However, if the points predictions are far together, then the third degree polynomial is much smoother. For these reason, I have chosen a duration value at 0.1s. So, at this moment, my configuration was N=15 and dt=0.1s.
 But with this configuration, I had sometimes a few bad predictions. 
 So finally, I have chosen the configuration follows : N=10, dt=0.1s.
 
 * Polynomial Fitting and MPC Preprocessing
+
 The waypoints are preprocessed by transforming them to the vehicle's coordinate system. So now the vehicle is at the origin of the frame. Also, the new orientation angle is now zero. The estimation of the polynomial is thus facilitated.
 
 * Model Predictive Control with Latency
+
 Before send the current state to the MPC procedure, I applied a latency of 0.1s. It useful to predict where the vehicle will be in 100ms and so what will be the actuations to do to minimize the errors given that the actuations will take effect in only 100ms after the current state.
 So, for that, I predicted the state after 100ms based on the current state and current actuations. 
 Then, the predicted state can be send to the MPC procedure to calculate the next actuations necessary to keep the car on the road. 
